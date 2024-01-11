@@ -39,7 +39,7 @@ export default function SignUp ()  {
   } =  useForm<FormValues>({ resolver: yupResolver(schema) });
  
   const onSubmit:SubmitHandler<FormValues> = async(data) => {
-    console.log(data.FirstName);
+    //console.log(data.FirstName);
     const requestOptions = {
 		  method: 'POST',
 		  headers: { 

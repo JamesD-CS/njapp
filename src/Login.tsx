@@ -1,6 +1,9 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import cookies from 'js-cookie';
+import { useLocalStorage } from 'usehooks-ts';
+import { CartContext } from "./cartContext";
+
 
 export default function Login() {
 
@@ -9,6 +12,10 @@ export default function Login() {
         const [password, setPass] = useState('');
         const [message, setMessage] = useState('');
         const navigate = useNavigate();
+        const  cartContext = useContext(CartContext);
+        const [username, setUsername] = useLocalStorage('user_name', '');
+
+
 
         let handleSubmit = async (e:React.FormEvent) => {
           //e.preventDefault();
@@ -16,8 +23,7 @@ export default function Login() {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'Accept':'*/*'
-                   
+                'Accept':'*/*'   
             },
             body: JSON.stringify({
               email: email,
@@ -26,14 +32,20 @@ export default function Login() {
           };
           console.log('fetching request');
           fetch("http://localhost:9000/login", requestOptions).then((response) => {
-            if(!response.ok) throw new Error(response.status.toString() );
+            if(!response.ok) {
+              //throw new Error(response.status.toString() );
+              alert("invalid login");
+            }
             else return response.json();
           })
           .then((data) => {
             console.log(data.token);
             cookies.set('token', data.token, { expires: 2, secure: true });
+            cookies.set('user_name', data.user_name, { expires: 2, secure: true });
+            setUsername(data.user_name);
             setMessage("login successful");
             navigate('/user', { replace: true });
+            cartContext?.setIsLoggedIn(true);
           })
           .catch((error) => {
             console.log('error: ' + error);

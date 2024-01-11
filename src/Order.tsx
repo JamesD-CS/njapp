@@ -11,14 +11,16 @@ import { CartContext, useCartContext } from "./cartContext";
 import { Item, Order } from "./appTypes";
 import cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
+import './App.css';
+
 
 
 
 export default function CreateOrder() {
     const [data, setData] = useLocalStorage('data', []);
-    const[apiCache, setApicache] = useLocalStorage('api_cache', []);
     const  cartContext = useContext(CartContext);
     const navigate = useNavigate();
+    const cartTotal = cartContext?.getCartTotal();
 
     
     const columnHelper = createColumnHelper<Item>()
@@ -68,6 +70,7 @@ export default function CreateOrder() {
       toast.info("Order reset");
     };
 
+  
     /* Load menu items from api in useEffect hook. Passing an empty array will load items from api
     on page render */
     useEffect(() => {
@@ -88,12 +91,12 @@ export default function CreateOrder() {
       .then((data) => {
         console.log(data);
         setData(data);
-        setApicache(data);
       })
       .catch((error) => {
         console.log('error: ' + error);
       });
-      console.log('cookie is', cookies.get('token'));
+      let token:string | undefined = cookies.get('token');
+      console.log('cookie is', token);
       return () => {
         
       };
@@ -103,7 +106,7 @@ export default function CreateOrder() {
     return (
       <div>
         <ToastContainer autoClose={2000 } position="bottom-center"/>
-        <table>
+        <table className='styled-table'>
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
@@ -132,14 +135,20 @@ export default function CreateOrder() {
             </tr>
           ))}
         </tbody>
-        
+        <tfoot>
+          <tr>
+            <td>Total:</td>
+            <td>${cartTotal}</td>
+          </tr>
+        </tfoot>
+       
       </table>
         
 
         <button  onClick={getCart}>Show cart</button>
         <button  onClick={clearCart}>Clear cart</button>
 
-        
+ 
       </div>
     );
   

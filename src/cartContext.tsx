@@ -6,10 +6,14 @@ export type CartContextType = {
     cartItems:Order[] | null
     addToCart: (item: Item) => void;
     removeItem:(item_id:number)=> void;
+    updateQuantity:(item_id:number, ammount:number)=>void;
     clearCart:() => void;
     getItemCount:() => number;
     getCartItems:() => Order[];
     getCartTotal:() => number;
+    getIsLoggedIn:() => boolean;
+    setIsLoggedIn:(isloggedin:boolean) => void;
+
     
   }
  
@@ -17,32 +21,38 @@ export const CartContext = createContext<CartContextType | null>({
   cartItems: null,
   addToCart: (item:Item) => null,
   removeItem:(item_id:number) => null,
+  updateQuantity:(item_id:number, ammount:number)=>null,
   clearCart:() => null,
   getItemCount:() => 0,
   getCartItems:  () => [],
-  getCartTotal: () => 0
+  getCartTotal: () => 0,
+  getIsLoggedIn:() => false,
+  setIsLoggedIn:(isloggedin:boolean) => false
 });
 
 export const useCartContext = () => useContext(CartContext);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Order[]);
+    const[isLoggedIn, setLoggedIn] = useLocalStorage('is_logged_in', false);
   
-    const addToCart = (item:Item) => {
-      function isItemInCart(item:Item):boolean {
-        let isincart = false;
-        let i:number = 0;
-        while (i < cartItems.length){
-          if (cartItems[i].item_id === item.item_id){
-            isincart = true;
-            break;
-          }
-          i ++;
+    const isItemInCart = (item_id:number):boolean => {
+      let isincart = false;
+      let i:number = 0;
+      while (i < cartItems.length){
+        if (cartItems[i].item_id === item_id){
+          isincart = true;
+          break;
         }
-        return isincart;
+        i ++;
       }
-  
-      if (isItemInCart(item)) {
+      return isincart;
+    }
+
+    const addToCart = (item:Item) => {
+      
+      if (isItemInCart(item.item_id)) {
+
         setCartItems(
           cartItems.map((cartItem) =>
             cartItem.item_id === item.item_id
@@ -50,6 +60,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
               : cartItem
           )
         );
+
       } else {
         let newItem:Order = {item_id: item.item_id, item_name:item.item_name, 
           quantity:1, price:item.price};
@@ -59,6 +70,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const removeItem =(item_id:number)=>{
+      console.log('in cart context remove item');
       let n:number = 0;
       while (n < cartItems.length){
         if(cartItems[n].item_id === item_id){
@@ -67,6 +79,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           break;
         }
         n++;
+      }
+    };
+
+    const updateQuantity=(item_id:number, ammount:number) => {
+      console.log('in cartcontext update quantity');
+      let change:number= 0;
+      if (ammount > 0){
+        change = 1;
+      }else if (ammount < 0){
+        change = -1;
+      }
+      if (isItemInCart(item_id)) {
+        setCartItems(
+          cartItems.map((cartItem) =>
+            cartItem.item_id === item_id
+              ? { ...cartItem, quantity: cartItem.quantity + change }
+              : cartItem
+          )
+        );
+
       }
     };
   
@@ -84,7 +116,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const getCartItems = ():Order[]=>{
-
       return cartItems;
     }
   
@@ -95,15 +126,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return total;
     };
-  
-    /*
-    useEffect(() => {
-      const cartItems = localStorage.getItem("cart_items") ;
-      if (cartItems) {
-        //setCartItems(cartItems);
-      }
-    }, []);
-    */
+
+    const getIsLoggedIn = ():boolean =>{
+      return isLoggedIn;
+    };
+
+    const setIsLoggedIn = (isloggedin:boolean) =>{
+      setLoggedIn(isloggedin);
+    }
   
     return (
       <CartContext.Provider
@@ -111,10 +141,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           cartItems,
           addToCart,
           removeItem,
+          updateQuantity,
           clearCart,
           getItemCount,
           getCartItems,
           getCartTotal,
+          getIsLoggedIn,
+          setIsLoggedIn
         }}
       >
         {children}
