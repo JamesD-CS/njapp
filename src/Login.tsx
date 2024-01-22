@@ -15,8 +15,6 @@ export default function Login() {
         const  cartContext = useContext(CartContext);
         const [username, setUsername] = useLocalStorage('user_name', '');
 
-
-
         let handleSubmit = async (e:React.FormEvent) => {
           //e.preventDefault();
           const requestOptions = {
@@ -75,7 +73,7 @@ export default function Login() {
               className="input"
             />
             <br></br>
-            <button type="submit" className="btn">Submit</button>
+            <button type="submit" className="button-1">Submit</button>
             <div className="message">{message ? <p>{message}</p> : null}</div>
 
           </form>

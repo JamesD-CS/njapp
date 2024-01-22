@@ -9,8 +9,8 @@ function Home ({}) {
 export default function App() {
   return (
     <div>
-        <h3>SPA App - Home</h3>
-        <p>This is a paragraph on the HomePage of the SPA App.</p>
+        <h3>Food API - Home</h3>
+        <p>Welcome to the food ordering app.</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useContext } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { Item, Order } from './appTypes';
 
@@ -30,7 +30,7 @@ export const CartContext = createContext<CartContextType | null>({
   setIsLoggedIn:(isloggedin:boolean) => false
 });
 
-export const useCartContext = () => useContext(CartContext);
+//export const useCartContext = () => useContext(CartContext);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Order[]);

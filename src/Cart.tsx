@@ -9,10 +9,10 @@ import {
 import { useLocalStorage } from 'usehooks-ts';
 import {Api_driver} from "./api_driver";
 import { CartContext } from "./cartContext";
-import { Item, Order } from "./appTypes";
+import { Order } from "./appTypes";
 import cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
-
+import {DateTime} from 'luxon';
 import './App.css';
 
 
@@ -28,28 +28,28 @@ export default function Cart() {
     const columnHelper = createColumnHelper<Order>()
     const columns = [
       columnHelper.accessor(data => data.item_name, {
-        id:'item_name',
+        id:'Item',
         cell: info => info.getValue(),
       }),
 
       columnHelper.display({
         id: 'minus',
-        cell: props =>  <button type="button">-</button> ,
+        cell: props =>  <button type="button" className='button-1'>-</button> ,
       }),
 
     columnHelper.accessor(data=> data.quantity, {
-      id:'quantity',
+      id:'Quantity',
       cell: info => info.getValue(),
     }),
 
     columnHelper.display({
       id: 'plus',
-      cell: props =>  <button type="button">+</button> ,
+      cell: props =>  <button type="button" className='button-1'>+</button> ,
     }),
     
     columnHelper.display({
       id: 'delete',
-      cell: props =>  <button type="button">Remove Item</button> ,
+      cell: props =>  <button type="button" className='button-1'>Remove Item</button> ,
     })
     
   ];
@@ -79,7 +79,8 @@ export default function Cart() {
 
   const placeOrder = async() => {
     if (getCookie()){
-    let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    let dt = DateTime.now();
+    let date = dt.toISO().toString().slice(0, 19).replace('T', ' ');
     let itemsJSON = JSON.stringify(cartContext?.getCartItems());
     let token:string = cookies.get('token') as string;
     let orderjson = JSON.stringify({ 'items':itemsJSON,
@@ -95,10 +96,11 @@ export default function Cart() {
 		};
     
     try {
-      
+      console.log(orderjson);
 		  let res = await fetch("http://localhost:9000/order", requestOptions);
 		  
 		  if (res.status === 201) {
+        clearCart();
         toast.success("Order placed",{autoClose: 2000,position: "bottom-center"});
         //navigate('/login');
       
@@ -139,7 +141,8 @@ export default function Cart() {
       return (
         <div>
           <ToastContainer autoClose={2000 } position="bottom-center"/>
-
+          <br></br>
+          <br></br>
           <h2>My Cart</h2>
 
           <table className='styled-table'>
@@ -178,9 +181,9 @@ export default function Cart() {
         </tfoot>
         
       </table>
-      <button  onClick={clearCart}>Clear Cart</button>
-      <br></br>
-      <button  onClick={placeOrder}>Place Order</button>
+      <button  className = 'button-1' onClick={clearCart}>Clear Cart</button>
+      {" "}
+      <button  className = 'button-1' onClick={placeOrder}>Place Order</button>
 
       
           

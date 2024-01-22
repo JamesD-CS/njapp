@@ -1,4 +1,4 @@
-import {useState , useEffect, useContext}from "react";
+import { useEffect, useContext}from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -7,44 +7,40 @@ import {
 } from '@tanstack/react-table'
 import { useLocalStorage } from 'usehooks-ts';
 import { ToastContainer, toast } from 'react-toastify';
-import { CartContext, useCartContext } from "./cartContext";
-import { Item, Order } from "./appTypes";
+import { CartContext } from "./cartContext";
+import { Item } from "./appTypes";
 import cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import './App.css';
-
-
-
 
 export default function CreateOrder() {
     const [data, setData] = useLocalStorage('data', []);
     const  cartContext = useContext(CartContext);
     const navigate = useNavigate();
-    const cartTotal = cartContext?.getCartTotal();
-
-    
+    const cartTotal = cartContext?.getCartTotal();   
     const columnHelper = createColumnHelper<Item>()
-
+    
     const columns = [
-      columnHelper.accessor('item_name', {
+      columnHelper.accessor(info => info.item_name, {
+        id:'Name',
         cell: info => info.getValue(),
-        footer: info => info.column.id,
       }),
 
-    columnHelper.accessor('item_description', {
-      cell: info => info.getValue(),
-      footer: info => info.column.id,
-    }),
-    columnHelper.accessor('price', {
-      cell: info => info.getValue(),
-      footer: info => info.column.id,
-    }),
-    columnHelper.display({
-      id: 'actions',
-      cell: props =>  <button type="button">Add</button> ,
-    })
-    
-  ]
+      columnHelper.accessor(info=> info.item_description, {
+        id:'Description',
+        cell: info => info.getValue(),
+      }),
+
+      columnHelper.accessor(info=> info.price, {
+        id:'Price',
+        cell: info => info.getValue(),
+      }),
+
+      columnHelper.display({
+        id: 'actions',
+        cell: props =>  <button type="button" className='button-1'>Add</button> ,
+      })
+    ];
 
     const table = useReactTable({
       data,
@@ -106,7 +102,10 @@ export default function CreateOrder() {
     return (
       <div>
         <ToastContainer autoClose={2000 } position="bottom-center"/>
+        <h2>Order</h2>
+
         <table className='styled-table'>
+
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
@@ -141,12 +140,12 @@ export default function CreateOrder() {
             <td>${cartTotal}</td>
           </tr>
         </tfoot>
-       
       </table>
         
 
-        <button  onClick={getCart}>Show cart</button>
-        <button  onClick={clearCart}>Clear cart</button>
+        <button  className = 'button-1' onClick={getCart}>Show cart</button>
+        {" "}
+        <button  className = 'button-1' onClick={clearCart}>Clear cart</button>
 
  
       </div>

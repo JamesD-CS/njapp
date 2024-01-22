@@ -56,7 +56,7 @@ export default function SignUp ()  {
     
     try {
       
-		  let res = await fetch("http://localhost:9000/register_user", requestOptions);
+		  let res = await fetch("http://localhost:9000/register_user_test", requestOptions);
 		  
 		  if (res.status === 201) {
         toast.success("Sign up successful",{autoClose: 2000,position: "bottom-center"});
@@ -144,7 +144,7 @@ export default function SignUp ()  {
           <p role="alert">password is required</p>
         )}
          <br></br>
-        <button type="submit" className="btn">Submit</button>
+        <button type="submit" className="button-1">Submit</button>
       </form>
     </div>
 	);
